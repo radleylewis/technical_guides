@@ -2,9 +2,8 @@
 
 #### YouTube Tutorial 
 See the video tutorial [here](https://www.youtube.com/watch?v=Qgg5oNDylG8).
-![image](https://github.com/user-attachments/assets/926911a5-a673-46e4-9a0c-c3b4a0b26d61)
 
-###### 27 July 2024
+###### 12 May 2025
 
 # Arch Install [btrfs + encryption + zram + timeshift + qtile]
 
