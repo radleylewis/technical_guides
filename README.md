@@ -5,14 +5,14 @@ See the video tutorial [here](https://www.youtube.com/watch?v=Qgg5oNDylG8).
 
 ###### 12 May 2025
 
-# Arch Install [btrfs + encryption + zram + timeshift + qtile]
+# Arch Install [btrfs + encryption + zram + timeshift + cosmic]
 
 Good morning, good afternoon or good evening, whereever you are reading this from. These installation instructions form the foundation of the Arch system that I use on my own machine. While it's important to always consult the official Arch wiki install guide [here](https://wiki.archlinux.org/title/Installation_guide), sometimes you may find your preferences deviating from the the official guide, and so my intention here is to provide a walkthrough on setting up your own system with the following:
    - [btrfs](https://btrfs.readthedocs.io/en/latest/): A feature rich, copy-on-write filesystem for Linux.
    - [encryption](https://gitlab.com/cryptsetup/cryptsetup/): LUKS disk encryption based on the dm-crypt kernel module.
    - [zram](https://www.kernel.org/doc/html/v5.9/admin-guide/blockdev/zram.html): RAM compression for memory savings.
    - [timeshift](https://github.com/linuxmint/timeshift): A system restore tool for Linux.
-   - [QTile](https://qtile.org/): A full-featured, hackable tiling window manager written and configured in Python.
+   - [Cosmic](https://system76.com/cosmic/): A New Desktop Environment
 
 My intention is to keep this guide up-to-date, and any feedback is more than welcome. Let's get started.
 
