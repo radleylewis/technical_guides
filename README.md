@@ -8,11 +8,11 @@ See the video tutorial [here](https://www.youtube.com/watch?v=Qgg5oNDylG8).
 # Arch Install [btrfs + encryption + zram + timeshift + cosmic]
 
 Good morning, good afternoon or good evening, whereever you are reading this from. These installation instructions form the foundation of the Arch system that I use on my own machine. While it's important to always consult the official Arch wiki install guide [here](https://wiki.archlinux.org/title/Installation_guide), sometimes you may find your preferences deviating from the the official guide, and so my intention here is to provide a walkthrough on setting up your own system with the following:
-   - [btrfs](https://btrfs.readthedocs.io/en/latest/): A feature rich, copy-on-write filesystem for Linux.
-   - [encryption](https://gitlab.com/cryptsetup/cryptsetup/): LUKS disk encryption based on the dm-crypt kernel module.
-   - [zram](https://www.kernel.org/doc/html/v5.9/admin-guide/blockdev/zram.html): RAM compression for memory savings.
-   - [timeshift](https://github.com/linuxmint/timeshift): A system restore tool for Linux.
-   - [Cosmic](https://system76.com/cosmic/): A New Desktop Environment
+   - [btrfs](https://btrfs.readthedocs.io/en/latest/): A feature rich, copy-on-write filesystem for Linux.  
+   - [encryption](https://gitlab.com/cryptsetup/cryptsetup/): LUKS disk encryption based on the dm-crypt kernel module.  
+   - [zram](https://www.kernel.org/doc/html/v5.9/admin-guide/blockdev/zram.html): RAM compression for memory savings.   
+   - [timeshift](https://github.com/linuxmint/timeshift): A system restore tool for Linux.  
+   - [COSMIC Alpha 7](https://system76.com/cosmic/): A New Desktop Environment.  
 
 My intention is to keep this guide up-to-date, and any feedback is more than welcome. Let's get started.
 
@@ -46,13 +46,13 @@ Here we will follow the Arch wiki:
 - list your partitions with `lsblk`;
 - delete the existing partitions on the target disk [WARNING: your data will be lost]
 - create two partitions:
-> !NOTE: The official Arch Linux installation guide suggests implementing a swap partition and you are welcome to take this route. You could also create a swap subvolume within BTRFS, however, snapshots will be disabled where a volume has an active swapfile. In my case, I have opted instead of `zram` which works by compressing data in RAM, thereby stretching your RAM further. zram is only active when your RAM is at capacity.  
+> !NOTE: The official Arch Linux installation guide suggests implementing a swap partition and you are welcome to take this route. You could also create a swap subvolume within BTRFS, however, snapshots will be disabled where a volume has an active swapfile. In my case, I have opted instead of `zram` which works by compressing data in RAM, thereby stretching your RAM further. zram is only active when your RAM is at or close capacity.  
 
 - **efi** = 300mb    
 - **main** = allocate all remaining space (or as otherwise fit for your specific case) noting that BTRFS doesn't require pre-defined partition sizes, but rather allocates dynamically through subvolumes which act in a similar fashion to partitions but don't require the physical division of the target disk.
     
 9. format your main partition:  
-- setup encryption: `cryptsetup luksformat /dev/nvme0n1p2`  
+- setup encryption: `cryptsetup luksFormat /dev/nvme0n1p2`  
 - open your encrypted partition: `cryptsetup luksOpen /dev/nvme0n1p2 main`
 - format your partition: `mkfs.btrfs /dev/mapper/main`  
 - mount your main partition for installation: `mount /dev/mapper/main /mnt`  
@@ -61,14 +61,15 @@ Here we will follow the Arch wiki:
   **root**: `btrfs subvolume create @`  
   **home**: `btrfs subvolume create @home`
   > !NOTE: you are welcome to create your own subvolume names, but make sure you know what you are doing, because these subvolumes will also be referenced later when taking snapshots with timeshift.  
-- go back to the original (root) directory with `cd`
+- go back to the original (/home/root) directory with `cd -`
 - unmount our mnt partition: `umount /mnt`
-- create our boot and home mounting points `mkdir /mnt/{boot,home}`
+- create home mounting point `mkdir /mnt/home`
 - mount our subvolumes: `mount -o noatime,ssd,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/main /mnt`
 - mount our subvolumes: `mount -o noatime,ssd,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/main /mnt/home`
 10. format your efi partition:
 - efi: `mkfs.fat -F32 /dev/nvme0n1p1`
-- mount our efi partition with `mount /dev/nvme0np1 /mnt/boot`
+- create boot mounting point `mkdir /mnt/boot`  
+- mount our efi partition with `mount /dev/nvme0np1 /mnt/boot`  
 11. install base packages: `pacstrap /mnt base`
 12. generate the file system table: `genfstab -U -p /mnt >> /mnt/etc/fstab` (you can check this with `cat /mnt/etc/fstab`)
 13. change root into the new system: `arch-chroot /mnt`
@@ -84,13 +85,16 @@ We are now working within our Arch system on our device, but it's important to n
 - `hwclock --systohc`
 - locale `nvim /etc/locale.gen` uncomment your locale, write and exit and then run `locale-gen`
 - `echo "LANG=en_US.UTF-8" >> /etc/locale.conf` for locale
-- `echo "KEYMAP=en..." >> /etc/vconsole.conf` for keyboard
-2. change the hostname `echo "x1" >> /etc/hostname` (feel free to customise to your case, the x1 in my case is for the Lenovo x1 Carbon I am installing Arch on).
+- `echo "KEYMAP=us." >> /etc/vconsole.conf` for keyboard (select yours as appropriate)  
+2. change the hostname `echo "t480" >> /etc/hostname` (feel free to customise to your case, the t480 in my case is for the Lenovo t480 I am installing Arch on).
 3. set your root password: `passwd`
 4. set up a new user (replace `rad` with your preferred username):
 - create `useradd -m -g users -G wheel rad`; 
-- give your user a password with `passwd rad` (you will be prompted to enter a password); and,
-- add your user to the sudoers group: `echo "rad ALL=(ALL) ALL" >> /etc/sudoers.d/rad`.
+- give your user a password with `passwd rad` (you will be prompted to enter a password);  
+- create a sudoers directory with `mkdir /etc/sudoers.d`;  
+- set the sudoers direcotry permissions `chmod 755 /etc/sudoers.d`;  
+- add your user to the sudoers group: `echo "rad ALL=(ALL) ALL" >> /etc/sudoers.d/rad`; and,   
+- set the permissions for your sudoers user file `chmod 0440 /etc/sudoers.d/rad`.
 5. set mirrorlist `sudo reflector -c Thailand -a 12 --sort rate --save /etc/pacman.d/mirrorlist` (once again you can substitute Thailand with the location relevant to you)  
 
 Next, we will install all of the packages we need for our system. Refer to the bottom of this guide for a short summary on each package being installed. It's imperative to always know what you are doing, and what you are installing!
@@ -99,18 +103,18 @@ Next, we will install all of the packages we need for our system. Refer to the b
 
 6. install the main packages that our system will use:
 ```bash
-pacman -Syu base-devel linux linux-headers linux-firmware btrfs-progs grub efibootmgr mtools networkmanager network-manager-applet openssh sudo vim git iptables-nft ipset firewalld reflector acpid grub-btrfs
+pacman -Syu base-devel linux linux-headers linux-firmware btrfs-progs grub efibootmgr mtools networkmanager network-manager-applet openssh sudo neovim git iptables-nft ipset firewalld reflector acpid grub-btrfs
 ```
 
 7. install the following based on the manufacturer of your CPU:
   - **intel:** `pacman -S intel-ucode`
-  - **amd**: `pacman -S amd-code`
+  - **amd**: `pacman -S amd-ucode`
 
-8. install your window manager of choice:
+8. install your Desktop Environment and Display Manager of choice:
 ```bash
-pacman -S qtile xorg lightdm lightdm-gtk-greeter
+pacman -S ly cosmic
 ```
-> !NOTE: I am using QTile with X11, but you can just as easily install gnome, kde or whichever tiling window manager or graphical user environment that you would like at this stage. I am using X11 because at the time of writing I have experienced issues with using QTile as a Wayland compositor. I will revisit this from time to time and update this guide accordingly.
+> !NOTE: I am using COSMIC by System76, but you can just as easily install gnome, kde or whichever tiling window manager or graphical user environment that you would like at this stage. 
 
 9. install other useful packages:
 ```bash
@@ -119,7 +123,7 @@ pacman -S man-db man-pages texinfo bluez bluez-utils pipewire alsa-utils pipewir
 10. edit the mkinitcpio file for encrypt:
 - `vim /etc/mkinitcpio.conf` and search for HOOKS;
 - add encrypt (before filesystems hook);
-- add `atkbd` to the MODULES (enables external keyboard at device decryption prompt);
+- add `usbhid` & `atkbd` to the MODULES (enables external keyboard at device decryption prompt);
 - add `btrfs` to the MODULES; and,
 - recreate the `mkinitcpio -p linux`
 11. setup grub for the bootloader so that the system can boot linux:
@@ -133,20 +137,17 @@ pacman -S man-db man-pages texinfo bluez bluez-utils pipewire alsa-utils pipewir
 - network manager with `systemctl enable NetworkManager`
 - bluetooth with `systemctl enable bluetooth`
 - ssh with `systemctl enable sshd`
-- lightdm login manager with `systemctl enable lightdm.service`
+- ly display manager with `systemctl enable ly.service`
 - firewall with `systemctl enable firewalld`
 - reflector `systemctl enable reflector.timer`
 - `systemctl enable fstrim.timer`
 - `systemctl enable acpid`
-- `systemctl enable btrfsd`
 
 Now for the moment of truth. Make sure you have followed these steps above carefully, then reboot your system with the `reboot` command.
 
 ## Step 4: Tweaking our new Arch system
 
 When you boot up you will be presented with the grub bootloader menu, and then, once you have selected to boot into arch linux (or the timer has timed out and selected your default option) you will be prompted to enter your encryption password. Upon successful decryption, you will be presented with the lightdm greeter. Enter the password for the user you created earlier. 
-
-QTile out of the box doesn't look great - to say the least -, we still have some work to do. Keep it up!
 
 1. install [paru](https://github.com/Morganamilo/paru):
 ```bash
@@ -155,19 +156,22 @@ git clone https://aur.archlinux.org/paru.git
 cd paru
 makepkg -si
 ```
-3. install [zramd](https://github.com/maximumadmin/zramd):
+
+2. install [zramd](https://github.com/maximumadmin/zramd):
 ```bash
-paru -S zramd
-sudo systemctl enable --now zramd.service
+sudo pacman -Syu zram-generator
 ```
-> !NOTE: you can refer to `lsblk` to see `zram` active (with 8GB by default). To edit your `zram` configuration go to `sudo vim /etc/default/zramd`.
-3. install [auto-cpufreq](https://github.com/AdnanHodzic/auto-cpufreq):
+create file at: /etc/systemd/zram-generator.conf and add the below contents
 ```bash
-paru -S auto-cpufreq
-sudo systemctl enable --now auto-cpufreq.service
+[zram0]
+zram-size = ram * 2
+compression-algorithm = zstd
+swap-priority = 100
+fs-type = swap
 ```
-> !NOTE: you may also like to check out `tlp`, although for my use case `auto-cpufreq` works well enough.
-4. install [timeshift](https://github.com/linuxmint/timeshift):
+Then reboot. 
+
+3. install [timeshift](https://github.com/linuxmint/timeshift):
 ```bash
 paru -S timeshift timeshift-autosnap
 sudo timeshift --list-devices
@@ -177,8 +181,23 @@ sudo systemctl edit --full grub-btrfsd
 # rm : ExecStart=/usr/bin/grub-btrfsd --syslog /.snapshots
 # add: ExecStart=/usr/bin/grub-btrfsd --syslog -t
 sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+## Next: Optional Further Steps
+
+1. install [auto-cpufreq](https://github.com/AdnanHodzic/auto-cpufreq):
+```bash
+paru -S auto-cpufreq
+sudo systemctl enable --now auto-cpufreq.service
+```
+> !NOTE: you may also like to check out `tlp`, although for my use case `tlp` does not work with COSMIC's power applet.
+
+2. install `power-profiles-daemon`:
+```bash
+pacman -Syu power-profiles-daemon`
+sudo systemctl enable --now power-profiles-daemon.service
 ```
 
-## Next: Ricing QTile
-
-Stay tuned for a guide on fully customizing QTile. 
+3. install `brave-browser`:
+```bash
+paru -S brave-browser
+```
