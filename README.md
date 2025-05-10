@@ -147,7 +147,7 @@ Now for the moment of truth. Make sure you have followed these steps above caref
 
 ## Step 4: Tweaking our new Arch system
 
-When you boot up you will be presented with the grub bootloader menu, and then, once you have selected to boot into arch linux (or the timer has timed out and selected your default option) you will be prompted to enter your encryption password. Upon successful decryption, you will be presented with the lightdm greeter. Enter the password for the user you created earlier. 
+When you boot up you will be presented with the grub bootloader menu, and then, once you have selected to boot into arch linux (or the timer has timed out and selected your default option) you will be prompted to enter your encryption password. Upon successful decryption, you will be presented with the ly greeter. Enter the password for the user you created earlier. 
 
 1. install [paru](https://github.com/Morganamilo/paru):
 ```bash
@@ -192,7 +192,7 @@ sudo grub-mkconfig -o /boot/grub/grub.cfg
 paru -S auto-cpufreq
 sudo systemctl enable --now auto-cpufreq.service
 ```
-> !NOTE: you may also like to check out `tlp`, although for my use case `tlp` does not work with COSMIC's power applet.
+> !NOTE: you may also like to check out `tlp`, although for my use case `tlp` does not work with COSMIC's power applet (see next step).
 
 2. install `power-profiles-daemon`:
 ```bash
