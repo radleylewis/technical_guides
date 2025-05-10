@@ -70,7 +70,7 @@ Here we will follow the Arch wiki:
 - efi: `mkfs.fat -F32 /dev/nvme0n1p1`
 - create boot mounting point `mkdir /mnt/boot`  
 - mount our efi partition with `mount /dev/nvme0np1 /mnt/boot`  
-11. install base packages: `pacstrap /mnt base`
+11. install base packages: `pacstrap -K /mnt base linux linux-firmware`
 12. generate the file system table: `genfstab -U -p /mnt >> /mnt/etc/fstab` (you can check this with `cat /mnt/etc/fstab`)
 13. change root into the new system: `arch-chroot /mnt`
 
@@ -161,7 +161,7 @@ makepkg -si
 ```bash
 sudo pacman -Syu zram-generator
 ```
-create file at: /etc/systemd/zram-generator.conf and add the below contents
+create file at: /etc/systemd/zram-generator.conf and add the below contents [guide here](https://forum.manjaro.org/t/howto-install-and-configure-zram-using-zram-generator/168610?page=2)  
 ```bash
 [zram0]
 zram-size = ram * 2
