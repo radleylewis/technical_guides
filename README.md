@@ -178,9 +178,9 @@ sudo timeshift --list-devices
 sudo timeshift --create --comments "[27JUL2024] start of time" --tags D
 sudo systemctl edit --full grub-btrfsd
 ```
-> # NOTE:
-> # rm : ExecStart=/usr/bin/grub-btrfsd --syslog /.snapshots
-> # add: ExecStart=/usr/bin/grub-btrfsd --syslog -t
+> !NOTE:
+> rm : ExecStart=/usr/bin/grub-btrfsd --syslog /.snapshots
+> add: ExecStart=/usr/bin/grub-btrfsd --syslog -t
 ```bash
 sudo grub-mkconfig -o /boot/grub/grub.cfg
 ```
