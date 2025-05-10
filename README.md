@@ -1,9 +1,9 @@
 📍Chiang Mai, Thailand
 
 #### YouTube Tutorial 
-See the video tutorial [here](https://www.youtube.com/watch?v=Qgg5oNDylG8).
+See the video tutorial [here](https://youtu.be/fFxWuYui2LI)).
 
-###### 12 May 2025
+###### 10 May 2025
 
 # Arch Install [btrfs + encryption + zram + timeshift + cosmic]
 
