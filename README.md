@@ -1,7 +1,7 @@
 📍Chiang Mai, Thailand
 
 #### YouTube Tutorial 
-See the video tutorial [here](https://youtu.be/fFxWuYui2LI)).
+See the video tutorial [here](https://youtu.be/fFxWuYui2LI).
 
 ###### 10 May 2025
 
