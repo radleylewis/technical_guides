@@ -182,7 +182,7 @@ Then reboot.
 ```bash
 paru -S timeshift timeshift-autosnap
 sudo timeshift --list-devices
-sudo timeshift --create --comments "[10MAY2024] start of time" --tags D
+sudo timeshift --create --comments "[10MAY2025] start of time" --tags D
 sudo systemctl edit --full grub-btrfsd
 ```
 > !NOTE:  
