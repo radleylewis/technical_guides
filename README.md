@@ -85,16 +85,20 @@ We are now working within our Arch system on our device, but it's important to n
 - `hwclock --systohc`
 - locale `nvim /etc/locale.gen` uncomment your locale, write and exit and then run `locale-gen`
 - `echo "LANG=en_US.UTF-8" >> /etc/locale.conf` for locale
-- `echo "KEYMAP=us." >> /etc/vconsole.conf` for keyboard (select yours as appropriate)  
+- `echo "KEYMAP=us." >> /etc/vconsole.conf` for keyboard (select yours as appropriate)
+
 2. change the hostname `echo "t480" >> /etc/hostname` (feel free to customise to your case, the t480 in my case is for the Lenovo t480 I am installing Arch on).
-3. set your root password: `passwd`
-4. set up a new user (replace `rad` with your preferred username):
+
+4. set your root password: `passwd`
+
+6. set up a new user (replace `rad` with your preferred username):
 - create `useradd -m -g users -G wheel rad`; 
 - give your user a password with `passwd rad` (you will be prompted to enter a password);  
 - create a sudoers directory with `mkdir /etc/sudoers.d`;  
 - set the sudoers direcotry permissions `chmod 755 /etc/sudoers.d`;  
 - add your user to the sudoers group: `echo "rad ALL=(ALL) ALL" >> /etc/sudoers.d/rad`; and,   
 - set the permissions for your sudoers user file `chmod 0440 /etc/sudoers.d/rad`.
+
 5. set mirrorlist `sudo reflector -c Thailand -a 12 --sort rate --save /etc/pacman.d/mirrorlist` (once again you can substitute Thailand with the location relevant to you)  
 
 Next, we will install all of the packages we need for our system. Refer to the bottom of this guide for a short summary on each package being installed. It's imperative to always know what you are doing, and what you are installing!
@@ -103,7 +107,7 @@ Next, we will install all of the packages we need for our system. Refer to the b
 
 6. install the main packages that our system will use:
 ```bash
-pacman -Syu base-devel linux linux-headers linux-firmware btrfs-progs grub efibootmgr mtools networkmanager network-manager-applet openssh sudo neovim git iptables-nft ipset firewalld reflector acpid grub-btrfs
+pacman -Syu base-devel linux-headers btrfs-progs grub efibootmgr mtools networkmanager network-manager-applet openssh sudo neovim git iptables-nft ipset firewalld reflector acpid grub-btrfs
 ```
 
 7. install the following based on the manufacturer of your CPU:
@@ -120,12 +124,14 @@ pacman -S ly cosmic
 ```bash
 pacman -S man-db man-pages texinfo bluez bluez-utils pipewire alsa-utils pipewire pipewire-pulse pipewire-jack sof-firmware ttf-firacode-nerd alacritty firefox
 ```
+
 10. edit the mkinitcpio file for encrypt:
 - `vim /etc/mkinitcpio.conf` and search for HOOKS;
 - add encrypt (before filesystems hook);
 - add `usbhid` & `atkbd` to the MODULES (enables external keyboard at device decryption prompt);
 - add `btrfs` to the MODULES; and,
 - recreate the `mkinitcpio -p linux`
+
 11. setup grub for the bootloader so that the system can boot linux:
 - `grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB`
 - `grub-mkconfig -o /boot/grub/grub.cfg`
@@ -133,6 +139,7 @@ pacman -S man-db man-pages texinfo bluez bluez-utils pipewire alsa-utils pipewir
 - edit the grub config `nvim /etc/default/grub`
 - `GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID=d33844ad-af1b-45c7-9a5c-cf21138744b4:main root=/dev/mapper/main`
 - make the grub config with `grub-mkconfig -o /boot/grub/grub.cfg`
+
 12. enable services:
 - network manager with `systemctl enable NetworkManager`
 - bluetooth with `systemctl enable bluetooth`
@@ -175,30 +182,31 @@ Then reboot.
 ```bash
 paru -S timeshift timeshift-autosnap
 sudo timeshift --list-devices
-sudo timeshift --create --comments "[27JUL2024] start of time" --tags D
+sudo timeshift --create --comments "[10MAY2024] start of time" --tags D
 sudo systemctl edit --full grub-btrfsd
 ```
-> !NOTE:
-> rm : ExecStart=/usr/bin/grub-btrfsd --syslog /.snapshots
-> add: ExecStart=/usr/bin/grub-btrfsd --syslog -t
+> !NOTE:  
+> rm : ExecStart=/usr/bin/grub-btrfsd --syslog /.snapshots  
+> add: ExecStart=/usr/bin/grub-btrfsd --syslog -t  
 ```bash
 sudo grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
 ## Next: Optional Further Steps
-
-1. install [auto-cpufreq](https://github.com/AdnanHodzic/auto-cpufreq):
-```bash
-paru -S auto-cpufreq
-sudo systemctl enable --now auto-cpufreq.service
-```
+1. install `power-profiles-daemon`:
 > !NOTE: you may also like to check out `tlp`, although for my use case `tlp` does not work with COSMIC's power applet (see next step).
-
-2. install `power-profiles-daemon`:
 ```bash
 pacman -Syu power-profiles-daemon`
 sudo systemctl enable --now power-profiles-daemon.service
 ```
+
+2. install [auto-cpufreq](https://github.com/AdnanHodzic/auto-cpufreq):
+```bash
+paru -S auto-cpufreq  
+sudo systemctl enable --now auto-cpufreq.service  
+```
+
+
 
 3. install `brave-browser`:
 ```bash
