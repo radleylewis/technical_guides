@@ -46,7 +46,7 @@ Here we will follow the Arch wiki:
 - list your partitions with `lsblk`;
 - delete the existing partitions on the target disk [WARNING: your data will be lost]
 - create two partitions:
-> !NOTE: The official Arch Linux installation guide suggests implementing a swap partition and you are welcome to take this route. You could also create a swap subvolume within BTRFS, however, snapshots will be disabled where a volume has an active swapfile. In my case, I have opted instead of `zram` which works by compressing data in RAM, thereby stretching your RAM further. zram is only active when your RAM is at or close capacity.  
+> !NOTE: The official Arch Linux installation guide suggests implementing a swap partition and you are welcome to take this route. You could also create a swap subvolume within BTRFS, however, snapshots will be disabled where a volume has an active swapfile. In my case, I have opted instead for `zram` which works by compressing data in RAM, thereby stretching your RAM further. zram is only active when your RAM is at or close to capacity.  
 
 - **efi** = 300mb    
 - **main** = allocate all remaining space (or as otherwise fit for your specific case) noting that BTRFS doesn't require pre-defined partition sizes, but rather allocates dynamically through subvolumes which act in a similar fashion to partitions but don't require the physical division of the target disk.
@@ -199,15 +199,11 @@ sudo grub-mkconfig -o /boot/grub/grub.cfg
 pacman -Syu power-profiles-daemon`
 sudo systemctl enable --now power-profiles-daemon.service
 ```
-
 2. install [auto-cpufreq](https://github.com/AdnanHodzic/auto-cpufreq):
 ```bash
 paru -S auto-cpufreq  
 sudo systemctl enable --now auto-cpufreq.service  
 ```
-
-
-
 3. install `brave-browser`:
 ```bash
 paru -S brave-browser
