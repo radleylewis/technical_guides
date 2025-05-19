@@ -133,7 +133,7 @@ pacman -S man-db man-pages texinfo bluez bluez-utils pipewire alsa-utils pipewir
 - recreate the `mkinitcpio -p linux`
 
 11. setup grub for the bootloader so that the system can boot linux:
-- `grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --disable-shim-lock`
+- `grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB`
 > NOTE: `--disable-shim-lock` disables GRUB's built in shim lock protocol support. This flag is optional, and should only be passed if you are using custom keys (not the Microsoft Signed shim mechanism).
 - `grub-mkconfig -o /boot/grub/grub.cfg`
 - run blkid and obtain the UUID for the main partitin: `blkid`
@@ -236,7 +236,10 @@ sudo sbctl enroll-keys
 sudo sbctl sign -s /boot/vmlinuz-linux
 ```
 > NOTE: this is the compressed kernel that your bootloader will load at boot. If you are using other kernel versions (e.g. linux-zen, linux-lts) you will need to sign these also
-5. create a standalone grub image
+5. create a standalone grub image:
+- Reinstall grub `grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --disable-shim-lock --refresh`  
+> NOTE: `--disable-shim-lock` disables GRUB's built in shim lock protocol support. This flag is optional, and should only be passed if you are using custom keys (not the Microsoft Signed shim mechanism).
+- makde the grub config `grub-mkconfig -o /boot/grub/grub.cfg`
 ```
 sudo grub-mkstandalone \
     --format=x86_64-efi \
@@ -255,7 +258,28 @@ sudo grub-mkstandalone \
 ```
 sudo sbctl sign -s /boot/EFI/GRUB/grubx64.efi # grub standalone bootloader binary
 ```
-6. add `microcode` to the modules in `/etc/default/grub`
-7. Reboot the machine and disable Secure Boot in the BIOS
+6. create a GRUB password:
+```
+set superusers="admin"
+password_pbkdf2 admin <generated-hash>
+```
+7. Restrict access to grub files
+```
+sudo chmod 600 /boot/grub/grub.cfg
+sudo chmod -R 700 /etc/grub.d
+```
+8. prevent modifications to your grub file:
+```
+chattr +i /boot/grub/grub.cfg
+```
+9. update `/etc/default/grub`:
+- [is this required?] add `microcode` to the modules in `/etc/default/grub`;  
+- set `GRUB_DISABLE_RECOVERY="true"`; and,  
+- set `GRUB_DISABLE_OS_PROBER=true`.
+11. Make the grub config:
+```
+grub-mkconfig -o /boot/grub/grub.cfg
+```
+11. Reboot the machine and disable Secure Boot in the BIOS
 
 
