@@ -208,3 +208,37 @@ sudo systemctl enable --now auto-cpufreq.service
 ```bash
 paru -S brave-browser
 ```
+
+## Security
+The following steps are the foundation of a secure Arch system. There are additional steps that you may of course take to harden your system further, and so you should consider this as a starting point. 
+
+### Secure Boot
+Step 1: Boot into your system BIOS, and:
+1. Clear Vendor Keys (if you are not dual booting);
+2. Disable Secure Boot; and,
+3. Ensure that Setup Mode is enabled.
+Step 2: Configure your system for Secure Boot
+1. Install `sbctl`
+```
+sudo pacman -Syu sbctl
+```
+2. Generate Keys
+```
+sudo sbctl create-keys
+```
+3. Enroll your keys
+```
+sudo sbctl enroll-keys
+```
+4. Sign the necessary binaries loaded at boot:
+```
+sudo sbctl sign -s /boot/vmlinuz-linux
+```
+> NOTE: this is the compressed kernel that your bootloader will load at boot. If you are using other kernel versions (e.g. linux-zen, linux-lts) you will need to sign these also
+```
+sudo sbctl sign -s /boot/EFI/GRUB/grubx64.efi # grub bootloader binary
+sudo sbctl sign -s /boot/grub/x86_64-efi/core.efi # helper binary loaded by GRUB
+```
+5. Reboot the machine and disable Secure Boot in the BIOS
+
+
