@@ -133,7 +133,8 @@ pacman -S man-db man-pages texinfo bluez bluez-utils pipewire alsa-utils pipewir
 - recreate the `mkinitcpio -p linux`
 
 11. setup grub for the bootloader so that the system can boot linux:
-- `grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB`
+- `grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --disable-shim-lock`
+> NOTE: `--disable-shim-lock` disables GRUB's built in shim lock protocol support. This flag is optional, and should only be passed if you are using custom keys (not the Microsoft Signed shim mechanism).
 - `grub-mkconfig -o /boot/grub/grub.cfg`
 - run blkid and obtain the UUID for the main partitin: `blkid`
 - edit the grub config `nvim /etc/default/grub`
@@ -235,10 +236,26 @@ sudo sbctl enroll-keys
 sudo sbctl sign -s /boot/vmlinuz-linux
 ```
 > NOTE: this is the compressed kernel that your bootloader will load at boot. If you are using other kernel versions (e.g. linux-zen, linux-lts) you will need to sign these also
+5. create a standalone grub image
 ```
-sudo sbctl sign -s /boot/EFI/GRUB/grubx64.efi # grub bootloader binary
-sudo sbctl sign -s /boot/grub/x86_64-efi/core.efi # helper binary loaded by GRUB
+sudo grub-mkstandalone \
+    --format=x86_64-efi \
+    --output=/boot/EFI/GRUB/grubx64.efi \
+    --locales="" \
+    --fonts="" \
+    --themes="" \
+    --verbose \
+    "/boot/grub/grub.cfg=/boot/grub/grub.cfg"
 ```
-5. Reboot the machine and disable Secure Boot in the BIOS
+> NOTE: you can now remove the following files which are included in the standalone
+> ```
+> sudo rm /boot/grub/x86-64-efi/core.efi
+> sudo rm /boot/grub/x86-64-efi/grub.efi
+> sudo rm /boot/grub/x86-64-efi/*.mod
+```
+sudo sbctl sign -s /boot/EFI/GRUB/grubx64.efi # grub standalone bootloader binary
+```
+6. add `microcode` to the modules in `/etc/default/grub`
+7. Reboot the machine and disable Secure Boot in the BIOS
 
 
