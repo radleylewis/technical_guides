@@ -231,35 +231,20 @@ sudo sbctl create-keys
 ```
 sudo sbctl enroll-keys
 ```
-4. Sign the necessary binaries loaded at boot:
+> NOTE: this is the compressed kernel that your bootloader will load at boot. If you are using other kernel versions (e.g. linux-zen, linux-lts) you will need to sign these also
+4. create the grub image:
+- Reinstall grub `sudo grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --disable-shim-lock --modules="tpm" --recheck`  
+> NOTE: `--disable-shim-lock` disables GRUB's built in shim lock protocol support. This flag is optional, and should only be passed if you are using custom keys (not the Microsoft Signed shim mechanism).
+- make the grub config `sudo grub-mkconfig -o /boot/grub/grub.cfg`
+5. sign the necessary binaries loaded at boot:
 ```
 sudo sbctl sign -s /boot/vmlinuz-linux
+sudo sbctl sign -s /boot/EFI/GRUB/grubx64.efi
 ```
-> NOTE: this is the compressed kernel that your bootloader will load at boot. If you are using other kernel versions (e.g. linux-zen, linux-lts) you will need to sign these also
-5. create a standalone grub image:
-- Reinstall grub `grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --disable-shim-lock --refresh`  
-> NOTE: `--disable-shim-lock` disables GRUB's built in shim lock protocol support. This flag is optional, and should only be passed if you are using custom keys (not the Microsoft Signed shim mechanism).
-- makde the grub config `grub-mkconfig -o /boot/grub/grub.cfg`
-```
-sudo grub-mkstandalone \
-    --format=x86_64-efi \
-    --output=/boot/EFI/GRUB/grubx64.efi \
-    --locales="" \
-    --fonts="" \
-    --themes="" \
-    --verbose \
-    "/boot/grub/grub.cfg=/boot/grub/grub.cfg"
-```
-> NOTE: you can now remove the following files which are included in the standalone
-> ```
-> sudo rm /boot/grub/x86-64-efi/core.efi
-> sudo rm /boot/grub/x86-64-efi/grub.efi
-> sudo rm /boot/grub/x86-64-efi/*.mod
-```
-sudo sbctl sign -s /boot/EFI/GRUB/grubx64.efi # grub standalone bootloader binary
-```
+**REBOOT AND DISABLE SECURE BOOT TO ENSURE IT IS WORKING**
 6. create a GRUB password:
 ```
+grub-mkpasswd-pbkdf2
 set superusers="admin"
 password_pbkdf2 admin <generated-hash>
 ```
@@ -273,7 +258,6 @@ sudo chmod -R 700 /etc/grub.d
 chattr +i /boot/grub/grub.cfg
 ```
 9. update `/etc/default/grub`:
-- [is this required?] add `microcode` to the modules in `/etc/default/grub`;  
 - set `GRUB_DISABLE_RECOVERY="true"`; and,  
 - set `GRUB_DISABLE_OS_PROBER=true`.
 11. Make the grub config:
