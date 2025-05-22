@@ -14,7 +14,9 @@ Good morning, good afternoon or good evening, whereever you are reading this fro
    - [timeshift](https://github.com/linuxmint/timeshift): A system restore tool for Linux.  
    - [COSMIC Alpha 7](https://system76.com/cosmic/): A New Desktop Environment.  
 
-My intention is to keep this guide up-to-date, and any feedback is more than welcome. Let's get started.
+My intention is to keep this guide up-to-date, and any feedback is more than welcome. 
+
+Let's get started!  
 
 ## Step 1: Creating a bootable Arch media device
 
@@ -56,7 +58,7 @@ Here we will follow the Arch wiki:
 - open your encrypted partition: `cryptsetup luksOpen /dev/nvme0n1p2 main`
 - format your partition: `mkfs.btrfs /dev/mapper/main`  
 - mount your main partition for installation: `mount /dev/mapper/main /mnt`  
-- now we need into the `/mnt` directory with `cd /mnt`  
+- now we need to `cd` into the `/mnt` directory with `cd /mnt`  
 - create our subvolumes:  
   **root**: `btrfs subvolume create @`  
   **home**: `btrfs subvolume create @home`
@@ -101,7 +103,7 @@ We are now working within our Arch system on our device, but it's important to n
 
 5. set mirrorlist `sudo reflector -c Thailand -a 12 --sort rate --save /etc/pacman.d/mirrorlist` (once again you can substitute Thailand with the location relevant to you)  
 
-Next, we will install all of the packages we need for our system. Refer to the bottom of this guide for a short summary on each package being installed. It's imperative to always know what you are doing, and what you are installing!
+Next, we will install all of the packages we need for our system. It's imperative to always know what you are doing, and what you are installing!
 
 > !NOTE: you could of course install all of the following packages together, but I have broken them up so they are easier to reason about.
 
@@ -197,7 +199,7 @@ sudo grub-mkconfig -o /boot/grub/grub.cfg
 1. install `power-profiles-daemon`:
 > !NOTE: you may also like to check out `tlp`, although for my use case `tlp` does not work with COSMIC's power applet (see next step).
 ```bash
-pacman -Syu power-profiles-daemon`
+pacman -Syu power-profiles-daemon
 sudo systemctl enable --now power-profiles-daemon.service
 ```
 2. install [auto-cpufreq](https://github.com/AdnanHodzic/auto-cpufreq):
@@ -214,11 +216,11 @@ paru -S brave-browser
 The following steps are the foundation of a secure Arch system. There are additional steps that you may of course take to harden your system further, and so you should consider this as a starting point. 
 
 ### Secure Boot
-Step 1: Boot into your system BIOS, and:
+**Step 1:** Boot into your system BIOS, and:
 1. Clear Vendor Keys (if you are not dual booting);
 2. Disable Secure Boot; and,
-3. Ensure that Setup Mode is enabled.
-Step 2: Configure your system for Secure Boot
+3. Ensure that Setup Mode is enabled.  
+**Step 2:** Configure your system for Secure Boot
 1. Install `sbctl`
 ```
 sudo pacman -Syu sbctl
@@ -231,36 +233,38 @@ sudo sbctl create-keys
 ```
 sudo sbctl enroll-keys
 ```
-> NOTE: this is the compressed kernel that your bootloader will load at boot. If you are using other kernel versions (e.g. linux-zen, linux-lts) you will need to sign these also
+> NOTE: this is the compressed kernel that your bootloader will load at boot. If you are using other kernel versions (e.g. linux-zen, linux-lts) you will need to sign these too!  
 4. create the grub image:
-- Reinstall grub `sudo grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --disable-shim-lock --modules="tpm" --recheck`  
+- Reinstall grub: 
+```sudo grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --disable-shim-lock --modules="tpm" --recheck```  
 > NOTE: `--disable-shim-lock` disables GRUB's built in shim lock protocol support. This flag is optional, and should only be passed if you are using custom keys (not the Microsoft Signed shim mechanism).
-- make the grub config `sudo grub-mkconfig -o /boot/grub/grub.cfg`
+- make the grub config: 
+```sudo grub-mkconfig -o /boot/grub/grub.cfg```
 5. sign the necessary binaries loaded at boot:
 ```
 sudo sbctl sign -s /boot/vmlinuz-linux
 sudo sbctl sign -s /boot/EFI/GRUB/grubx64.efi
 ```
-**REBOOT AND DISABLE SECURE BOOT TO ENSURE IT IS WORKING**
-6. create a GRUB password:
+**Step 3:** REBOOT AND DISABLE SECURE BOOT TO ENSURE IT IS WORKING   
+1. create a GRUB password:
 ```
 grub-mkpasswd-pbkdf2
 set superusers="admin"
 password_pbkdf2 admin <generated-hash>
 ```
-7. Restrict access to grub files
+2. Restrict access to grub files
 ```
 sudo chmod 600 /boot/grub/grub.cfg
 sudo chmod -R 700 /etc/grub.d
 ```
-8. prevent modifications to your grub file:
+3. prevent modifications to your grub file:
 ```
 chattr +i /boot/grub/grub.cfg
 ```
-9. update `/etc/default/grub`:
+4. update `/etc/default/grub`:
 - set `GRUB_DISABLE_RECOVERY="true"`; and,  
 - set `GRUB_DISABLE_OS_PROBER=true`.
-11. Make the grub config:
+4. Make the grub config:
 ```
 grub-mkconfig -o /boot/grub/grub.cfg
 ```
