@@ -174,7 +174,7 @@ sudo pacman -Syu zram-generator
 create file at: /etc/systemd/zram-generator.conf and add the below contents [guide here](https://forum.manjaro.org/t/howto-install-and-configure-zram-using-zram-generator/168610?page=2)  
 ```bash
 [zram0]
-zram-size = ram * 2
+zram-size = ram / 2
 compression-algorithm = zstd
 swap-priority = 100
 fs-type = swap
