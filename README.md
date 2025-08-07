@@ -109,7 +109,25 @@ Next, we will install all of the packages we need for our system. It's imperativ
 
 6. install the main packages that our system will use:
 ```bash
-pacman -Syu base-devel linux-headers btrfs-progs grub efibootmgr mtools networkmanager network-manager-applet openssh sudo neovim git iptables-nft ipset firewalld reflector acpid grub-btrfs
+pacman -Syu \
+  base-devel \
+  linux-headers \
+  btrfs-progs \
+  grub \
+  efibootmgr \
+  mtools \
+  networkmanager \
+  network-manager-applet \
+  openssh \
+  sudo \
+  neovim \
+  git \
+  iptables-nft \
+  ipset \
+  firewalld \
+  reflector \
+  acpid \
+  grub-btrfs
 ```
 
 7. install the following based on the manufacturer of your CPU:
@@ -124,7 +142,21 @@ pacman -S ly cosmic
 
 9. install other useful packages:
 ```bash
-pacman -S man-db man-pages texinfo bluez bluez-utils pipewire alsa-utils pipewire pipewire-pulse pipewire-jack sof-firmware ttf-firacode-nerd alacritty firefox
+pacman -S \
+  man-db \
+  man-pages \
+  texinfo \
+  bluez \
+  bluez-utils \
+  pipewire \
+  alsa-utils \
+  pipewire \
+  pipewire-pulse \
+  pipewire-jack \
+  sof-firmware \
+  ttf-firacode-nerd \
+  alacritty \
+  firefox
 ```
 
 10. edit the mkinitcpio file for encrypt:
@@ -270,4 +302,4 @@ grub-mkconfig -o /boot/grub/grub.cfg
 ```
 11. Reboot the machine and disable Secure Boot in the BIOS
 
-
+That's all folks!
