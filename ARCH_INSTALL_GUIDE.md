@@ -5,7 +5,7 @@ Good morning, good afternoon or good evening, wherever you are reading this from
 > [!resources] **Supporting links:**
 > - [Arch Linux installation guide](https://wiki.archlinux.org/title/Installation_guide)
 > - [YouTube tutorial](https://youtu.be/fFxWuYui2LI)
-> - [GitHub (same guide)](https://github.com/radleylewis/arch_installation_guide)
+> - [Website Hosted Guide](https://www.radleylewis.com/lab/guides/arch-installation-guide/) (same guide with better formatting)
 
 - [btrfs](https://btrfs.readthedocs.io/en/latest/): A feature-rich, copy-on-write filesystem for Linux.
 - [encryption](https://gitlab.com/cryptsetup/cryptsetup/): LUKS disk encryption based on the dm-crypt kernel module.
